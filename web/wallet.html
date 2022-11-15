@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wallet Page</title>
+
+    <script>
+        const WALLET_ADDRESS_URL = 'http://localhost:8080/wallet/bitcoin/address/';
+        const WALLET_SYNC_URL = 'http://localhost:8080/wallet/sync';
+        const TRANSACTIONS_URL = 'http://localhost:8080/wallet/bitcoin/transactions/';
+        const HTTP_METHOD_DELETE = 'DELETE';
+        const HTTP_METHOD_GET = 'TET';
+        const HTTP_METHOD_POST = 'POST';
+
+        function callEndpoint(url, http_method) {
+            fetch(
+                url,
+                {
+                    headers: {"Content-Type": "application/json"},
+                    method: http_method,
+                    body: ""
+                }
+            )
+                .then(data => data.json())
+                .then((json) => {
+                    document.getElementById("response").innerHTML = json;
+                });
+            return false;
+        }
+
+        function addWalletID() {
+            return callEndpoint(WALLET_ADDRESS_URL + addWalletForm.walletID.value, HTTP_METHOD_POST);
+        }
+
+        function removeWalletID() {
+            return callEndpoint(WALLET_ADDRESS_URL + removeWalletForm.walletID.value, HTTP_METHOD_DELETE);
+        }
+
+
+        function getTransactions() {
+            return callEndpoint(TRANSACTIONS_URL + transactionsForm.walletID.value, HTTP_METHOD_GET);
+        }
+
+        function syncWallets() {
+            return callEndpoint(WALLET_SYNC_URL, HTTP_METHOD_POST);
+        }
+    </script>
+</head>
+
+<body>
+
+<form id="addWalletForm" onsubmit="return addWalletID(this)">
+    <input type="text" name="walletID" placeholder="wallet ID.." required>
+    <button type="submit">Add wallet ID</button>
+</form>
+
+<br>
+
+<form id="removeWalletForm" onsubmit="return removeWalletID(this)">
+    <input type="text" name="walletID" placeholder="wallet ID.." required>
+    <button type="submit">Remove wallet ID</button>
+</form>
+
+<br>
+
+<form id="transactionsForm" onsubmit="return getTransactions(this)">
+    <input type="text" name="walletID" placeholder="wallet ID.." required>
+    <button type="submit">Get transactions</button>
+</form>
+
+<br>
+
+<form id="syncWallets" onsubmit="return syncWallets(this)">
+    <button type="submit">Sync Wallets</button>
+</form>
+
+<br>
+
+<div id="response"></div>
+
+</body>
+</html>
