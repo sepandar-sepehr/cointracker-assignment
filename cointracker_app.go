@@ -1,44 +1,15 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"cointracker-assignment/handlers"
+	"context"
 	"html/template"
 	"log"
 	"net/http"
-	"strings"
+	"time"
 )
 
-const (
-	WalletPagePath   = "/wallet"
-	WalletSyncPath   = "/wallet/sync"
-	AddressPath      = "/wallet/bitcoin/address/"
-	TransactionsPath = "/wallet/bitcoin/transactions/"
-)
-
-func walletHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	switch r.Method {
-	case http.MethodPost:
-		walletId := strings.TrimPrefix(r.URL.Path, AddressPath)
-		json.NewEncoder(w).Encode(fmt.Sprintf("Wallet ID %s stored!", walletId))
-	case http.MethodDelete:
-		walletId := strings.TrimPrefix(r.URL.Path, AddressPath)
-		json.NewEncoder(w).Encode(fmt.Sprintf("Wallet ID %s not found!", walletId))
-	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	}
-}
-
-func walletSyncHandler(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode("Wallets Synced.")
-}
-
-func transactionsHandler(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode("Sample Transaction.")
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
+func renderPage(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("web/wallet.html")
 	err := t.Execute(w, nil)
 	if err != nil {
@@ -48,9 +19,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc(WalletPagePath, handler)
-	http.HandleFunc(WalletSyncPath, walletSyncHandler)
-	http.HandleFunc(AddressPath, walletHandler)
-	http.HandleFunc(TransactionsPath, transactionsHandler)
+	// Setting timeout 30 seconds for all APIs
+	ctx := context.Background()
+	ctx, cancelCtx := context.WithTimeout(ctx, 30*time.Second)
+	defer cancelCtx()
+
+	http.HandleFunc("/wallet", renderPage)
+	http.HandleFunc(handlers.WalletSyncPath, handlers.WalletSyncHandler)
+	http.HandleFunc(handlers.AddressPath, handlers.WalletHandler)
+	http.HandleFunc(handlers.TransactionsPath, handlers.TransactionsHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
