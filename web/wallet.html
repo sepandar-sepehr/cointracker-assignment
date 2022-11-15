@@ -24,7 +24,9 @@
                 .then(data => data.json())
                 .then((json) => {
                     document.getElementById("response").innerHTML = json;
-                });
+                }).catch(function (){
+                    document.getElementById("response").innerHTML = "failed";
+            });
             return false;
         }
 

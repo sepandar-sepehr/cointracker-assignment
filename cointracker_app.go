@@ -2,7 +2,10 @@ package main
 
 import (
 	"cointracker-assignment/handlers"
+	"cointracker-assignment/models"
 	"context"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 	"html/template"
 	"log"
 	"net/http"
@@ -24,9 +27,18 @@ func main() {
 	ctx, cancelCtx := context.WithTimeout(ctx, 30*time.Second)
 	defer cancelCtx()
 
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+	db.AutoMigrate(&models.Wallet{})
+
 	http.HandleFunc("/wallet", renderPage)
-	http.HandleFunc(handlers.WalletSyncPath, handlers.WalletSyncHandler)
-	http.HandleFunc(handlers.AddressPath, handlers.WalletHandler)
-	http.HandleFunc(handlers.TransactionsPath, handlers.TransactionsHandler)
+	walletSyncHandler := handlers.NewWalletSyncHandler(db)
+	http.HandleFunc(handlers.WalletSyncPath, walletSyncHandler.ServeRequest)
+	walletHandler := handlers.NewWalletHandler(db)
+	http.HandleFunc(handlers.AddressPath, walletHandler.ServeRequest)
+	transactionHandler := handlers.NewTransactionHandler(db)
+	http.HandleFunc(handlers.TransactionsPath, transactionHandler.ServeRequest)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
