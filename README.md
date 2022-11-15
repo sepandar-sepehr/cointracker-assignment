@@ -13,6 +13,7 @@ On this page, you can add a wallet ID, remove one, get transactions of, and sync
 
 ## TODO
 * Build repository instead of interacting with DB directly
-* Separate the struct of transaction response from DB models and API Request/Response
+* Separate the struct of client's transaction response from DB models
 * Add logging and metrics
-* Pagination for API call to get transactions
+* Pagination for API call to get transactions. Right now you have to manually call sync to fetch next pages
+* Build cron job to kick off syncing automatically
