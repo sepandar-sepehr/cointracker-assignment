@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cointracker-assignment/blockchain"
 	"cointracker-assignment/handlers"
 	"cointracker-assignment/models"
 	"context"
@@ -31,14 +32,18 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(&models.Wallet{})
+	db.AutoMigrate(&models.Wallet{}, &models.Transaction{})
 
 	http.HandleFunc("/wallet", renderPage)
-	walletSyncHandler := handlers.NewWalletSyncHandler(db)
+
+	walletSyncHandler := handlers.NewWalletSyncHandler(db, blockchain.NewBcComClient())
 	http.HandleFunc(handlers.WalletSyncPath, walletSyncHandler.ServeRequest)
+
 	walletHandler := handlers.NewWalletHandler(db)
 	http.HandleFunc(handlers.AddressPath, walletHandler.ServeRequest)
+
 	transactionHandler := handlers.NewTransactionHandler(db)
 	http.HandleFunc(handlers.TransactionsPath, transactionHandler.ServeRequest)
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

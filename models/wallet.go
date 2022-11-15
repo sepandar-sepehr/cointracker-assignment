@@ -1,9 +1,8 @@
 package models
 
-import "gorm.io/gorm"
-
 type Wallet struct {
-	gorm.Model
-	WalletID         string `gorm:"primaryKey"`
-	LastSyncTimeInMS int
+	WalletID           string `gorm:"primaryKey"`
+	LastSyncedTimeInMS int64
+	NextOffset         *string
+	FinalBalance       int
 }

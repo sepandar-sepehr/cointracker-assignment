@@ -14,3 +14,4 @@ On this page, you can add a wallet ID, remove one, get transactions of, and sync
 ## TODO
 * Build repository instead of interacting with DB directly 
 * Add logging and metrics
+* Pagination for API call to get transactions

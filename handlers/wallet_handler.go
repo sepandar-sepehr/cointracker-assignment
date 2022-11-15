@@ -26,8 +26,8 @@ func (h *WalletHandler) ServeRequest(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		walletId := strings.TrimPrefix(r.URL.Path, AddressPath)
 		result := h.db.Create(&models.Wallet{
-			WalletID:         walletId,
-			LastSyncTimeInMS: 0,
+			WalletID:           walletId,
+			LastSyncedTimeInMS: 0,
 		})
 		if result.Error != nil {
 			http.Error(w, "Wallet ID could not be saved", http.StatusInternalServerError)
