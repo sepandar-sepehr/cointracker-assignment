@@ -35,7 +35,8 @@ func (h *WalletSyncHandler) ServeRequest(w http.ResponseWriter, r *http.Request)
 			http.Error(w, "Could not fetch wallets", http.StatusBadGateway)
 			return
 		}
-		h.db.Model(&models.Wallet{}).Where("wallet_id = ?", wallet.WalletID).
+		h.db.Model(&models.Wallet{}).
+			Where("wallet_id = ?", wallet.WalletID).
 			Updates(map[string]interface{}{
 				"final_balance":          transactionsResponse.FinalBalance,
 				"last_synced_time_in_ms": time.Now().UnixMilli(),
